@@ -476,14 +476,42 @@ export const getMintTransaction = (
       address: new Address(contractAddress),
     });
     const totalPayment = new BigNumber(tokenSellingPrice).times(tokens);
-    return contract.call({
+    const callObj = {
       func: new ContractFunction(mintFunctionName),
       gasLimit: baseGasLimit + (baseGasLimit / 2) * (tokensAmount - 1),
       chainID: shortChainId[chain],
       args: [new U32Value(tokens)],
-      value: TokenTransfer.egldFromBigInteger(totalPayment),
+      tokenTransfer: TokenTransfer.fungibleFromAmount(
+        'NATA-9310be',
+        totalPayment,
+        0
+      ),
       caller,
-    });
+    };
+    console.log(callObj);
+    // {
+    //   func: ContractFunction { name: 'mint' },
+    //   gasLimit: 12500000,
+    //   chainID: 'D',
+    //   args: [
+    //     U32Value {
+    //       type: [U32Type],
+    //       value: [BigNumber],
+    //       sizeInBytes: 4,
+    //       withSign: false
+    //     }
+    //   ],
+    //   value: TokenTransfer {
+    //     tokenIdentifier: 'EGLD',
+    //     nonce: 0,
+    //     amountAsBigInteger: BigNumber { s: 1, e: 18, c: [Array] },
+    //     numDecimals: 18
+    //   },
+    //   caller: UserAddress {
+    //     buffer: <Buffer 63 db dd 3a 46 9b f0 9e 5a df 45 26 6b 3e 61 99 37 55 eb 69 23 93 30 04 4f 26 0e fc 5b 89 97 8b>
+    //   }
+    // }
+    return contract.call(callObj);
   }
 };
 
